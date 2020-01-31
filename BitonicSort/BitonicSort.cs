@@ -55,9 +55,9 @@ namespace CSharpSample
 
         public static void CompareAndSwap(int[] A, int i, int j, Direction direction)
         {
-            Direction k = A[i] > A[j] ? Direction.Ascending : Direction.Descending;
+            Direction k = A[i] > A[j] ? Direction.Descending : Direction.Ascending;
 
-            if (direction == k)
+            if (k != direction)
             {
                 Swap(ref A[i], ref A[j]);
             }
