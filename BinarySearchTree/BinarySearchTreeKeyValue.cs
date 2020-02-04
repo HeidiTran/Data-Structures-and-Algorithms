@@ -17,6 +17,25 @@ namespace CSharpSample
             Count = 0;
         }
 
+        public bool IsEmpty() { return Count == 0; }
+
+        /// <summary>
+        /// Returns the number of key-value pairs in this BST
+        /// </summary>
+        public int Size()
+        {
+            return Size(Root);
+        }
+
+        /// <summary>
+        /// Returns the number of key-value pairs in BST rooted at node
+        /// </summary>
+        private int Size(Node<TKey, TValue> node)
+        {
+            if (node == null) return 0;
+            return 1 + Size(node.Left) + Size(node.Right);
+        }
+
         /// <summary>
         /// Returns the value associated with the given key
         /// </summary>
@@ -28,7 +47,7 @@ namespace CSharpSample
         private TValue GetValue(Node<TKey, TValue> node, TKey key)
         {
             if (key == null) throw new ArgumentNullException();
-            if (node == null) return default(TValue);
+            if (node == null) return default;
             int cmp = key.CompareTo(node.Key);
 
             if (cmp < 0) return GetValue(node.Left, key);
@@ -98,7 +117,7 @@ namespace CSharpSample
         /// </summary>
         public void DeleteMin()
         {
-            if (Count == 0) throw new InvalidOperationException("BST is empty!");
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
             Root = DeleteMin(Root);
             Count--;
         }
@@ -115,7 +134,7 @@ namespace CSharpSample
         /// </summary>
         public void DeleteMax()
         {
-            if (Count == 0) throw new InvalidOperationException("BST is empty!");
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
             Root = DeleteMax(Root);
             Count--;
         }
@@ -132,7 +151,7 @@ namespace CSharpSample
         /// </summary>
         public TKey Min()
         {
-            if (Count == 0) throw new InvalidOperationException("BST is empty!");
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
             return Min(Root).Key;
         }
 
@@ -147,7 +166,7 @@ namespace CSharpSample
         /// </summary>
         public TKey Max()
         {
-            if (Count == 0) throw new InvalidOperationException("BST is empty!");
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
             return Max(Root).Key;
         }
 
@@ -163,7 +182,7 @@ namespace CSharpSample
         public TKey Floor(TKey key)
         {
             if (key == null) throw new ArgumentNullException();
-            if (Count == 0) throw new InvalidOperationException("BST is empty!");
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
 
             Node<TKey, TValue> res = Floor(Root, key);
             if (res == null) throw new InvalidOperationException("No key is less than or equal to specified key!");
@@ -188,7 +207,7 @@ namespace CSharpSample
         public TKey Ceilling(TKey key)
         {
             if (key == null) throw new ArgumentNullException();
-            if (Count == 0) throw new InvalidOperationException("BST is empty!");
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
 
             Node<TKey, TValue> res = Ceilling(Root, key);
             if (res == null) throw new InvalidOperationException("No key is less than or equal to specified key!");
@@ -205,6 +224,45 @@ namespace CSharpSample
             Node<TKey, TValue> floorLeftBranchNode = Floor(node.Left, key);
             if (floorLeftBranchNode == null) return node;
             else return floorLeftBranchNode;
+        }
+
+        /// <summary>
+        /// Returns the number of keys in the BST STRICTLY less than key
+        /// </summary>
+        public int Rank(TKey key)
+        {
+            if (key == null) throw new ArgumentNullException();
+            return Rank(Root, key);
+        }
+
+        private int Rank(Node<TKey, TValue> node, TKey key)
+        {
+            if (node == null) return 0;
+            int cmp = key.CompareTo(node.Key);
+            if (cmp < 0) return Rank(node.Left, key);
+            else if (cmp > 0) return 1 + Size(node.Left) + Rank(node.Right, key);
+            else return Size(node.Left);
+        }
+
+        /// <summary>
+        /// Return the key in the BST whose rank is k
+        /// </summary>
+        public TKey Select(int k)
+        {
+            if (k < 0 || k >= Count) throw new ArgumentException();
+
+            Node<TKey, TValue> node = Select(Root, k);
+            return node.Key;
+        }
+
+        private Node<TKey, TValue> Select(Node<TKey, TValue> node, int k)
+        {
+            if (node == null) return null;
+            int t = Size(node.Left);
+
+            if (k < t) return Select(node.Left, k);
+            else if (k > t) return Select(node.Right, k - t - 1);
+            else return node;
         }
 
         /// <summary>
@@ -228,10 +286,33 @@ namespace CSharpSample
                 case TraversalMethod.InOrder:
                     return TraverseLeft.Concat(Self).Concat(TraverseRight);
                 case TraversalMethod.PostOrder:
-                    return TraverseRight.Concat(TraverseRight).Concat(Self);
+                    return TraverseLeft.Concat(TraverseRight).Concat(Self);
                 default:
                     throw new ArgumentException();
             }
+        }
+
+        /// <summary>
+        /// Returns all keys in the BST in the given range
+        /// </summary>
+        public IEnumerable<TKey> GetKeys(TKey loKey, TKey hiKey)
+        {
+            if (loKey == null) throw new ArgumentNullException("First arg is null!");
+            if (hiKey == null) throw new ArgumentNullException("First arg is null!");
+
+            Queue<TKey> keys = new Queue<TKey>();
+            GetKeys(Root, keys, loKey, hiKey);
+            return keys;
+        }
+
+        private void GetKeys(Node<TKey, TValue> node, Queue<TKey> keys, TKey loKey, TKey hiKey)
+        {
+            if (node == null) return;
+            int cmplo = loKey.CompareTo(node.Key);
+            int cmphi = hiKey.CompareTo(node.Key);
+            if (cmplo < 0) GetKeys(node.Left, keys, loKey, hiKey);
+            if (cmplo <= 0 && cmphi >= 0) keys.Enqueue(node.Key);
+            if (cmphi > 0) GetKeys(node.Right, keys, loKey, hiKey);
         }
 
         /// <summary>
@@ -255,7 +336,7 @@ namespace CSharpSample
                 case TraversalMethod.InOrder:
                     return TraverseLeft.Concat(Self).Concat(TraverseRight);
                 case TraversalMethod.PostOrder:
-                    return TraverseRight.Concat(TraverseRight).Concat(Self);
+                    return TraverseLeft.Concat(TraverseRight).Concat(Self);
                 default:
                     throw new ArgumentException();
             }
@@ -263,7 +344,7 @@ namespace CSharpSample
 
         public IEnumerable<TKey> GetKeys2(TraversalMethod method)
         {
-            if (Count == 0) return new Queue<TKey>();
+            if (IsEmpty()) return new Queue<TKey>();
             return GetKeys2(Min(), Max(), method);
         }
 
@@ -317,6 +398,23 @@ namespace CSharpSample
             return 1 + Math.Max(GetDepth(node.Left), GetDepth(node.Right));
         }
 
+        /// <summary>
+        /// Is all left nodes are strictly smaller than node and all right nodes are strictly larger
+        /// </summary>
+        private bool IsBST()
+        {
+            return IsBST(Root, default(TKey), default(TKey));
+        }
+
+        private bool IsBST(Node<TKey, TValue> node, TKey min, TKey max)
+        {
+            if (node == null) return true;
+            if (min != null && node.Key.CompareTo(min) <= 0) return false;
+            if (max != null && node.Key.CompareTo(max) >= 0) return false;
+            return IsBST(node.Left, min, node.Key) && IsBST(node.Right, node.Key, max);
+        }
+
+
         public enum TraversalMethod
         {
             PreOrder,
@@ -349,34 +447,45 @@ namespace CSharpSample
             bst.Add("R", 4);
             bst.Add("C", 5);
             bst.Add("H", 6);
+            
+            Console.WriteLine("Keys in order Traversal:");
+            foreach (var item in bst.GetKeys(BST<string, int>.TraversalMethod.InOrder))
+                Console.Write(item + " ");
+            Console.WriteLine("\nPre-order Traversal:");
+            foreach (var item in bst.GetKeys(BST<string, int>.TraversalMethod.PreOrder))
+                Console.Write(item + " ");
+            Console.WriteLine("\nPost-order Traversal:");
+            foreach (var item in bst.GetKeys(BST<string, int>.TraversalMethod.PostOrder))
+                Console.Write(item + " ");
+            Console.WriteLine();
 
-            Console.Write("In order Traversal: ");
+            Console.WriteLine("\nValues in order Traversal: ");
             foreach (var item in bst.GetValues(BST<string, int>.TraversalMethod.InOrder))
                 Console.Write(item + " ");
             Console.WriteLine();
-            Console.WriteLine("Count: " + bst.Count);
-            Console.WriteLine("Tree Depth: " + bst.GetTreeDepth());
+            Console.WriteLine("\nCount: " + bst.Count);
+            Console.WriteLine("\nTree Depth: " + bst.GetTreeDepth());
 
             string key = "A";
-            Console.WriteLine("Value of key " + key + ": " + bst.GetValue("A"));
+            Console.WriteLine("\nValue of key " + key + ": " + bst.GetValue("A") + "\n");
 
             Console.WriteLine("Max: " + bst.Max());
             Console.WriteLine("Min: " + bst.Min());
 
-            Console.WriteLine(bst.GetValue("M"));
+            key = "H";
+            Console.WriteLine("\nRank of " + key + ": " + bst.Rank(key) + "\n");
 
-            Console.WriteLine("In order Traversal:");
-            foreach (var item in bst.GetKeys2(BST<string, int>.TraversalMethod.InOrder))
+            string key1 = "C", key2 = "R";
+            Console.WriteLine("Keys between " + key1 + " and " + key2 + ": ");
+            foreach (var item in bst.GetKeys(key1, key2))
                 Console.Write(item + " ");
-            Console.WriteLine("\nPre-order Traversal:");
-            foreach (var item in bst.GetKeys2(BST<string, int>.TraversalMethod.PreOrder))
-                Console.Write(item + " ");
-            Console.WriteLine("\nPost-order Traversal:");
-            foreach (var item in bst.GetKeys2(BST<string, int>.TraversalMethod.PostOrder))
-                Console.Write(item + " ");
+            Console.WriteLine();
+
+            int rank = 2;
+            Console.WriteLine("\nKey at rank " + rank + ": " + bst.Select(rank));
 
             //bst.DeleteMin();
-            //bst.DeleteMax();
+            //bst.DeleteMax(); 
         }
     }
 }
