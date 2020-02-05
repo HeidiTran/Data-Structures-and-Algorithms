@@ -405,7 +405,8 @@ namespace CSharpSample
         {
             return IsBST(Root, default(TKey), default(TKey));
         }
-
+        
+        // In-order traversal of a BST must be sorted!  
         private bool IsBST(Node<TKey, TValue> node, TKey min, TKey max)
         {
             if (node == null) return true;
