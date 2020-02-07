@@ -8,8 +8,48 @@ namespace CSharpSample
     {
         static void Main(string[] args)
         {
+            ExamplePerfectBalance();
         }
 
+        private static void ExamplePerfectBalance()
+        {
+            Console.WriteLine("***ExamplePerfectBalanceKeyValuePairsList***");
+            List<KeyValuePair<string, int>> keyValuePairs = new List<KeyValuePair<string, int>>()
+            {
+                new KeyValuePair<string, int>("H", 6),
+                new KeyValuePair<string, int>("C", 3),
+                new KeyValuePair<string, int>("A", 2),
+                new KeyValuePair<string, int>("E", 1),
+                new KeyValuePair<string, int>("S", 9),
+                new KeyValuePair<string, int>("R", 8),
+                new KeyValuePair<string, int>("X", 7)
+            };
+
+            Console.WriteLine("Input:");
+            foreach (var item in keyValuePairs)
+                Console.WriteLine("(" + item.Key + ", " + item.Value + ")");
+
+            BST<string, int> bst = new BST<string, int>();
+            PerfectBalance(bst, keyValuePairs);
+
+            Console.WriteLine("\nIn Order Traversal: ");
+            foreach (var item in bst.GetKeys(BST<string, int>.TraversalMethod.InOrder))
+                Console.WriteLine("(" + item + ", " + bst.GetValue(item) + ")");
+
+            string[] keysArr = new string[] { "H", "C", "A", "E", "S", "R", "X" };
+
+            Console.WriteLine("\n***ExamplePerfectBalanceKeysArray***");
+            Console.WriteLine("Input:");
+            foreach (var item in keysArr)
+                Console.WriteLine(item);
+
+            BST<string, int> bst2 = new BST<string, int>();
+            PerfectBalance(bst2, keysArr);
+
+            Console.WriteLine("\nIn Order Traversal: ");
+            foreach (var item in bst2.GetKeys(BST<string, int>.TraversalMethod.InOrder))
+                Console.WriteLine("(" + item + ", " + bst2.GetValue(item) + ")");
+        }
 
         /// <summary>
         ///  Inserts a set of key-value pairs into an initially empty BST such that the tree produced is equivalent to binary search, 
