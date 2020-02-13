@@ -71,6 +71,122 @@ namespace CSharpSample
         }
 
         /// <summary>
+        /// Remove the specified key and associated value from the BST
+        /// </summary>
+        public void Delete(TKey key)
+        {
+            if (key == null) throw new ArgumentNullException();
+            if (!Contains(key)) return;
+
+            // if both children of root are black, set root to red
+            if (!IsRed(Root.Left) && !IsRed(Root.Right))
+                Root.Color = RED;
+
+            Root = Delete(Root, key);
+            if (!IsEmpty())
+                Root.Color = BLACK;
+            Count--;
+        }
+
+        private Node<TKey, TValue> Delete(Node<TKey, TValue> node, TKey key)
+        {
+            if (node == null) return null;
+            int cmp = key.CompareTo(node.Key);
+
+            if (cmp < 0)
+            {
+                if (!IsRed(node.Left) && !IsRed(node.Left.Left))
+                    node = MoveRedLeft(node);
+                node.Left = Delete(node.Left, key);
+            }
+            else
+            {
+                if (IsRed(node.Left))
+                    node = RotateRight(node);
+                if (key.CompareTo(node.Key) == 0 && (node.Right == null))
+                    return null;
+                if (!IsRed(node.Right) && !IsRed(node.Right.Left))
+                    node = MoveRedRight(node);
+                if (key.CompareTo(node.Key) == 0)
+                {
+                    Node<TKey, TValue> temp = node;
+
+                    // Node becomes the min node of right branch
+                    node = Min(temp.Right);
+                    node.Right = DeleteMin(temp.Right);
+                }
+                else
+                    node.Right = Delete(node.Right, key);
+            }
+
+            return Balance(node);
+        }
+
+        /// <summary>
+        /// Remove the smallest key and associated value from the BST
+        /// </summary>
+        public void DeleteMin()
+        {
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
+
+            // if both children of root are black, set root to red
+            if (!IsRed(Root.Left) && !IsRed(Root.Right))
+                Root.Color = RED;
+
+            Root = DeleteMin(Root);
+
+            if (!IsEmpty())
+                Root.Color = BLACK;
+            Count--;
+        }
+
+        private Node<TKey, TValue> DeleteMin(Node<TKey, TValue> node)
+        {
+            if (node.Left == null) return null; // No 2-3 tree exists with only right node
+
+            if (!IsRed(node.Left) && !IsRed(node.Left.Left))
+                node = MoveRedLeft(node);
+
+            node.Left = DeleteMin(node.Left);
+
+            return Balance(node);
+        }
+
+        /// <summary>
+        /// Remove the smallest key and associated value from the BST
+        /// </summary>
+        public void DeleteMax()
+        {
+            if (IsEmpty()) throw new InvalidOperationException("BST is empty!");
+
+            // if both children of root are black, set root to red
+            if (!IsRed(Root.Left) && !IsRed(Root.Right))
+                Root.Color = RED;
+
+            Root = DeleteMax(Root);
+
+            if (!IsEmpty())
+                Root.Color = BLACK;
+            Count--;
+        }
+
+        private Node<TKey, TValue> DeleteMax(Node<TKey, TValue> node)
+        {
+            if (IsRed(node.Left))
+                node = RotateRight(node);
+
+            if (node.Right == null)
+                return null;
+
+            if (!IsRed(node.Right) && !IsRed(node.Right.Left))
+                node = MoveRedRight(node);
+
+            node.Right = DeleteMax(node.Right);
+
+            return Balance(node);
+        }
+
+        /// <summary>
         /// Return the smallest key in the BST
         /// </summary>
         public TKey Min()
@@ -238,6 +354,35 @@ namespace CSharpSample
             if (node == null) return BLACK;
             return node.Color == RED;
         }
+
+        // Assuming that h is red and both h.left and h.left.left
+        // are black, make h.left or one of its children red.
+        private Node<TKey, TValue> MoveRedLeft(Node<TKey, TValue> node)
+        {
+            FlipColors(node);
+            if (IsRed(node.Right.Left))
+            {
+                node.Right = RotateRight(node.Right);
+                node = RotateLeft(node);
+                FlipColors(node);
+            }
+
+            return node;
+        }
+
+        // Assuming that h is red and both h.right and h.right.left
+        // are black, make h.right or one of its children red.
+        private Node<TKey, TValue> MoveRedRight(Node<TKey, TValue> node)
+        {
+            FlipColors(node);
+            if (IsRed(node.Left.Left))
+            {
+                node = RotateRight(node);
+                FlipColors(node);
+            }
+
+            return node;
+        }
         #endregion
 
         private class Node<TKey, TValue> where TKey : IComparable<TKey>
@@ -255,6 +400,7 @@ namespace CSharpSample
             }
         }
     }
+
 
     class Program
     {
