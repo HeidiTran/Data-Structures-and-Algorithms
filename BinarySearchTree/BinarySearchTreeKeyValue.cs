@@ -87,6 +87,7 @@ namespace CSharpSample
         public void Delete(TKey key)
         {
             if (key == null) throw new ArgumentNullException();
+            if (!Contains(key)) return;
             Root = Delete(Root, key);
             Count--;
         }
