@@ -271,7 +271,14 @@ namespace CSharpSample
         /// </summary>
         public IEnumerable<TKey> GetKeys(TraversalMethod method)
         {
+            if (method == TraversalMethod.LevelOrder)
+               return GetKeysLevelOrder(Root);
             return GetKeys(Root, method);
+        }
+
+        private IEnumerable<TKey> GetKeysLevelOrder(Node<TKey, TValue> node)
+        {
+            Queue<TKey> keys = new Queue<TKey>();
         }
 
         private IEnumerable<TKey> GetKeys(Node<TKey, TValue> node, TraversalMethod method)
@@ -416,9 +423,13 @@ namespace CSharpSample
             return IsBST(node.Left, min, node.Key) && IsBST(node.Right, node.Key, max);
         }
 
-
+        /// <summary>
+        /// Depth-First-Search (DFS): PreOrder, InOrder, PostOrder
+        /// Breadth-First-Search (BFS): LevelOrder
+        /// </summary>
         public enum TraversalMethod
         {
+            LevelOrder,
             PreOrder,
             InOrder,
             PostOrder
