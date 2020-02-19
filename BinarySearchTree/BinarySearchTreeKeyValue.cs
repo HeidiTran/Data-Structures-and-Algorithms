@@ -272,13 +272,32 @@ namespace CSharpSample
         public IEnumerable<TKey> GetKeys(TraversalMethod method)
         {
             if (method == TraversalMethod.LevelOrder)
-               return GetKeysLevelOrder(Root);
+                return GetKeysLevelOrder(Root);
             return GetKeys(Root, method);
         }
 
         private IEnumerable<TKey> GetKeysLevelOrder(Node<TKey, TValue> node)
         {
             Queue<TKey> keys = new Queue<TKey>();
+            Queue<Node<TKey, TValue>> queueNodes = new Queue<Node<TKey, TValue>>();
+
+            queueNodes.Enqueue(node);
+
+            while (queueNodes.Count != 0)
+            {
+                Node<TKey, TValue> x = queueNodes.Dequeue();
+
+                if (x == null) continue;
+
+                keys.Enqueue(x.Key);
+
+                // Enqueue node's children
+                queueNodes.Enqueue(x.Left);
+                queueNodes.Enqueue(x.Right);
+
+            }
+
+            return keys;
         }
 
         private IEnumerable<TKey> GetKeys(Node<TKey, TValue> node, TraversalMethod method)
@@ -328,7 +347,32 @@ namespace CSharpSample
         /// </summary>
         public IEnumerable<TValue> GetValues(TraversalMethod method)
         {
+            if (method == TraversalMethod.LevelOrder)
+                return GetValuesLevelOrder(Root);
             return GetValues(Root, method);
+        }
+
+        private IEnumerable<TValue> GetValuesLevelOrder(Node<TKey, TValue> node)
+        {
+            Queue<TValue> values = new Queue<TValue>();
+            Queue<Node<TKey, TValue>> queueNodes = new Queue<Node<TKey, TValue>>();
+
+            queueNodes.Enqueue(node);
+
+            while (queueNodes.Count != 0)
+            {
+                Node<TKey, TValue> x = queueNodes.Dequeue();
+
+                if (x == null) continue;
+
+                values.Enqueue(x.Value);
+
+                // Enqueue node's children
+                queueNodes.Enqueue(x.Left);
+                queueNodes.Enqueue(x.Right);
+            }
+
+            return values;
         }
 
         private IEnumerable<TValue> GetValues(Node<TKey, TValue> node, TraversalMethod method)
@@ -413,7 +457,7 @@ namespace CSharpSample
         {
             return IsBST(Root, default(TKey), default(TKey));
         }
-        
+
         // In-order traversal of a BST must be sorted!  
         private bool IsBST(Node<TKey, TValue> node, TKey min, TKey max)
         {
@@ -460,7 +504,7 @@ namespace CSharpSample
             bst.Add("R", 4);
             bst.Add("C", 5);
             bst.Add("H", 6);
-            
+
             Console.WriteLine("Keys in order Traversal:");
             foreach (var item in bst.GetKeys(BST<string, int>.TraversalMethod.InOrder))
                 Console.Write(item + " ");
@@ -469,6 +513,9 @@ namespace CSharpSample
                 Console.Write(item + " ");
             Console.WriteLine("\nPost-order Traversal:");
             foreach (var item in bst.GetKeys(BST<string, int>.TraversalMethod.PostOrder))
+                Console.Write(item + " ");
+            Console.WriteLine("\nLevel-order Traversal:");
+            foreach (var item in bst.GetKeys(BST<string, int>.TraversalMethod.LevelOrder))
                 Console.Write(item + " ");
             Console.WriteLine();
 
