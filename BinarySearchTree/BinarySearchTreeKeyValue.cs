@@ -41,24 +41,26 @@ namespace CSharpSample
         /// </summary>
         public TValue GetValue(TKey key)
         {
-            return GetValue(Root, key);
+            var node = Get(Root, key);
+            if(node == null) throw new KeyNotFoundException();
+            return node.Value;
         }
 
-        private TValue GetValue(Node<TKey, TValue> node, TKey key)
+        private TValue Get(Node<TKey, TValue> node, TKey key)
         {
             if (key == null) throw new ArgumentNullException();
-            if (node == null) return default;
+            if (node == null) return null;
             int cmp = key.CompareTo(node.Key);
 
-            if (cmp < 0) return GetValue(node.Left, key);
-            else if (cmp > 0) return GetValue(node.Right, key);
-            else return node.Value;
+            if (cmp < 0) return Get(node.Left, key);
+            else if (cmp > 0) return Get(node.Right, key);
+            else return node;
         }
 
         public bool Contains(TKey key)
         {
             if (key == null) throw new ArgumentNullException();
-            return GetValue(key) != null;
+            return Get(Root, key) != null;
         }
 
         public void Add(TKey key, TValue value)
