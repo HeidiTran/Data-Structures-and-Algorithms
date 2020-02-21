@@ -68,7 +68,7 @@ namespace CsharpSample
         /// </summary>
         public void Remove(TKey key)
         {
-            if (!Contains(key)) throw new KeyNotFoundException();
+            if (!Contains(key)) return;
             Head = Remove(Head, key);
         }
 
