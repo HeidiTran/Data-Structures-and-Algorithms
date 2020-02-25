@@ -14,7 +14,7 @@ namespace CsharpSample
         /// Number of key-value pairs
         /// </summary>
         public int Count { get; protected set; }
-        private int Size; // HashTable size
+        private int Size { get; set; } // HashTable size
 
         public HashTableSepChaining() : this(INIT_CAPACITY) { }
 
@@ -175,7 +175,7 @@ namespace CsharpSample
         /// </summary>
         public void Remove(TKey key)
         {
-            if (!Contains(key)) throw new KeyNotFoundException();
+            if (!Contains(key)) return;
             Head = Remove(Head, key);
         }
 
