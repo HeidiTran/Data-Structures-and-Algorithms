@@ -1,6 +1,6 @@
 using System;
 
-namespace CsharpSample 
+namespace CsharpSample
 {
     public class Node
     {
@@ -22,14 +22,60 @@ namespace CsharpSample
     {
         static void Main(string[] args)
         {
+            ExampleDetectCycleLinkedList0();
+            Console.WriteLine();
             ExampleDetectCycleLinkedList1();
             Console.WriteLine();
             ExampleDetectCycleLinkedList2();
             Console.WriteLine();
             ExampleDetectCycleLinkedList3();
+            Console.WriteLine();
+            ExampleDetectCycleLinkedList4();
         }
 
-        private static void ExampleDetectCycleLinkedList3()
+        private static void ExampleDetectCycleLinkedList0()
+        {
+            const int N = 2;
+
+            SingleLinkedList linkedList = new SingleLinkedList
+            {
+                head = new Node(0)
+            };
+
+            Node temp = linkedList.head;
+            for (int i = 1; i < N; i++)
+                temp = (temp.next = new Node(i));
+
+            TraverseSingleLinkedList(linkedList);
+
+            if (ContainCycle(linkedList))
+                Console.WriteLine("This linked list contains a cycle!");
+            else
+                Console.WriteLine("No cycle found!");
+        }
+
+        private static void ExampleDetectCycleLinkedList1()
+        {
+            const int N = 3;
+
+            SingleLinkedList linkedList = new SingleLinkedList
+            {
+                head = new Node(0)
+            };
+
+            Node temp = linkedList.head;
+            for (int i = 1; i < N; i++)
+                temp = (temp.next = new Node(i));
+
+            TraverseSingleLinkedList(linkedList);
+
+            if (ContainCycle(linkedList))
+                Console.WriteLine("This linked list contains a cycle!");
+            else
+                Console.WriteLine("No cycle found!");
+        }
+
+        private static void ExampleDetectCycleLinkedList4()
         {
             Console.WriteLine("0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -----");
             Console.WriteLine("                                   ^     /");
@@ -40,7 +86,7 @@ namespace CsharpSample
             {
                 head = new Node(0)
             };
-          
+
             Node temp = linkedList.head;
             for (int i = 1; i < N; i++)
                 temp = (temp.next = new Node(i));
@@ -59,7 +105,7 @@ namespace CsharpSample
                 Console.WriteLine("No cycle found!");
         }
 
-        private static void ExampleDetectCycleLinkedList2()
+        private static void ExampleDetectCycleLinkedList3()
         {
             const int N = 8;
             SingleLinkedList linkedList = new SingleLinkedList
@@ -89,7 +135,7 @@ namespace CsharpSample
                 Console.WriteLine("No cycle found!");
         }
 
-        private static void ExampleDetectCycleLinkedList1()
+        private static void ExampleDetectCycleLinkedList2()
         {
             const int N = 8;
             SingleLinkedList linkedList = new SingleLinkedList
@@ -124,7 +170,7 @@ namespace CsharpSample
             Node slowPointer = singleLinkedListA.head;
             Node fastPointer = singleLinkedListA.head;
 
-            while (fastPointer.next != null)
+            while (fastPointer != null && fastPointer.next != null)
             {
                 slowPointer = slowPointer.next;
                 fastPointer = fastPointer.next.next;
@@ -175,4 +221,3 @@ namespace CsharpSample
         }
     }
 }
-
