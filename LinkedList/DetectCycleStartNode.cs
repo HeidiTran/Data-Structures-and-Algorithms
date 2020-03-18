@@ -138,7 +138,7 @@ namespace CsharpSample
             Node slowPointer = singleLinkedListA.head;
             Node fastPointer = singleLinkedListA.head;
 
-            while (fastPointer.next != null)
+            while (fastPointer != null && fastPointer.next != null)
             {
                 slowPointer = slowPointer.next;
                 fastPointer = fastPointer.next.next;
